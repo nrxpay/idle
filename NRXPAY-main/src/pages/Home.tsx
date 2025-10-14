@@ -282,10 +282,10 @@ const Home = () => {
         usdtRate={rates?.buy_rate || 99}
       />
 
-      <RechargeSpinWheel 
-        isOpen={showSpinWheel}
-        onClose={() => setShowSpinWheel(false)}
-      />
+     {/* <RechargeSpinWheel 
+  isOpen={showSpinWheel}
+  onClose={() => setShowSpinWheel(false)}
+/> */}
 
       <BottomNavigation />
     </div>
