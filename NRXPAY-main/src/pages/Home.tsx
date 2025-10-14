@@ -7,7 +7,6 @@ import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import CautionBanner from "@/components/CautionBanner";
 import AttentionPopup from "@/components/AttentionPopup";
-import RechargeSpinWheel from "@/components/RechargeSpinWheel";
 import { useUSDTRates } from "@/hooks/useUSDTRates";
 import { useSpinWheelConfig } from "@/hooks/useSpinWheelConfig";
 
