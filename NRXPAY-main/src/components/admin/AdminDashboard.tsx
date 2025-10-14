@@ -34,7 +34,6 @@ import NotificationSender from "./NotificationSender";
 import TaskManagement from "./TaskManagement";
 import { FundRateManagement } from "./FundRateManagement";
 import MinimumWithdrawalManagement from "./MinimumWithdrawalManagement";
-import SpinWheelManagement from "./SpinWheelManagement";
 import CryptoManagement from "./CryptoManagement";
 
 export function AdminDashboard() {
@@ -182,15 +181,6 @@ export function AdminDashboard() {
               >
                 <Bell className="h-5 w-5 mr-3 text-gray-600" />
                 <span className="text-sm font-medium">Send Notifications</span>
-              </Button>
-              
-              <Button
-                variant={activeTab === "spin-wheel" ? "secondary" : "ghost"}
-                onClick={() => setActiveTab("spin-wheel")}
-                className="w-full justify-start h-12 px-4 hover:bg-gray-50"
-              >
-                <Sparkles className="h-5 w-5 mr-3 text-gray-600" />
-                <span className="text-sm font-medium">Spin Wheel Management</span>
               </Button>
               
               <Button
