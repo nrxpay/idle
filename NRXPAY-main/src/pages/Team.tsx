@@ -11,10 +11,10 @@ import { useTeamStats } from "@/hooks/useTeamStats";
 
 const Team = () => {
   const { teamStats, loading } = useTeamStats();
-  const [inviteLink] = useState("https://linkly.link/2FCV4");
+  const [inviteLink] = useState("https://short-url.org/1cI87");
   const [copied, setCopied] = useState(false);
   
-  const shareMessage = `Join me on NRXPay and start earning together! 🚀\n\nSign up using my link: ${inviteLink}`;
+  const shareMessage = `Join me on NRXPay and exchange usdt at highest rate in whole market! 🚀\n\nSign up using my link: ${inviteLink}`;
 
   const copyInviteLink = () => {
     navigator.clipboard.writeText(inviteLink);
