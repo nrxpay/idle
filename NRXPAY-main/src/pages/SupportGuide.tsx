@@ -65,7 +65,7 @@ const SupportGuide = () => {
               >
                 Contact @NRXPAYSUPPORT
               </Button>
-              <p className="text-xs text-orange-600">Please use English to communicate and Hindi users must use Phone/In App-Support for help.</p>
+              <p className="text-xs text-orange-600">Please use english and hindi to communicate.</p>
             </div>
           </div>
           
