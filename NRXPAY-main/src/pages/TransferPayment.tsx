@@ -14,7 +14,7 @@ const TransferPayment = () => {
   const [transactionId, setTransactionId] = useState("");
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
   
-  const walletAddress = "TQn9Y2khEsLJW1ChVWFMSMeRDow5KcbLSE";
+  const walletAddress = "TBbY2a6YoY6c932DrkZMLKRe3iBBg8X7jM";
 
   useEffect(() => {
     setAnimationClass("animate-pulse");
