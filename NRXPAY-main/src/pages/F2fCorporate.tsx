@@ -51,7 +51,7 @@ const F2fCorporate = () => {
 
         <div className="text-center mb-4">
           <Button
-            onClick={() => window.location.href = "https://t.me/nrxsupport"}
+            onClick={() => window.location.href = "https://t.me/nrxpaysupport"}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded h-12 text-lg"
           >
             Upload corporate now
