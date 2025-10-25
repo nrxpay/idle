@@ -372,6 +372,10 @@ const F2fCorporate = () => {
                 <MapPin className="h-4 w-4 mr-3 text-red-500" />
                 <span className="text-gray-700">PATNA</span>
               </div>
+              <div className="flex items-center">
+                <MapPin className="h-4 w-4 mr-3 text-red-500" />
+                <span className="text-gray-700">UDAIPUR</span>
+              </div>
             </div>
           </div>
         </div>
