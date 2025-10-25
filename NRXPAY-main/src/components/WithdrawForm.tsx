@@ -15,6 +15,14 @@ import { useMinimumWithdrawal } from "@/hooks/useMinimumWithdrawal";
 import { useUserBalance } from "@/hooks/useUserBalance";
 import { toast } from "sonner";
 
+interface UpiAccount {
+  id: number;
+  user_id: string;
+  upi_id: string;
+  name: string;
+  mobile_number: string;
+}
+
 interface BankAccount {
   user_id: string;
   account_number: string;
@@ -38,10 +46,14 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
   const { balance } = useUserBalance();
   const [amount, setAmount] = useState("");
   const [selectedBank, setSelectedBank] = useState<string>("");
+  const [selectedUpi, setSelectedUpi] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<"bank" | "upi">("bank");
   const [selectedFundType, setSelectedFundType] = useState<string>("gaming");
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [upiAccounts, setUpiAccounts] = useState<UpiAccount[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingBanks, setLoadingBanks] = useState(true);
+  const [loadingUpis, setLoadingUpis] = useState(true);
   const [userMinConfig, setUserMinConfig] = useState<any>(null);
 
   const usdtAmount = parseFloat(amount) || 0;
@@ -55,6 +67,7 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
     const loadData = async () => {
       if (isOpen && user) {
         fetchBankAccounts();
+        fetchUpiAccounts();
         const userConfig = await getUserConfig(user.id);
         setUserMinConfig(userConfig);
       }
@@ -64,7 +77,7 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
 
   const fetchBankAccounts = async () => {
     if (!user) return;
-    
+
     setLoadingBanks(true);
     try {
       const { data, error } = await supabase
@@ -72,7 +85,7 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
         .select('*')
         .eq('user_id', user.id)
         .eq('is_active', true);
-      
+
       if (error) throw error;
       setBankAccounts(data || []);
     } catch (error) {
@@ -80,6 +93,26 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
       toast.error('Failed to load bank accounts');
     } finally {
       setLoadingBanks(false);
+    }
+  };
+
+  const fetchUpiAccounts = async () => {
+    if (!user) return;
+
+    setLoadingUpis(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_upis')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setUpiAccounts(data || []);
+    } catch (error) {
+      console.error('Error fetching UPI accounts:', error);
+      toast.error('Failed to load UPI accounts');
+    } finally {
+      setLoadingUpis(false);
     }
   };
 
@@ -96,33 +129,38 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
       return;
     }
 
-    if (!isValidAmount || !selectedBank) {
+    if (!isValidAmount || (paymentMethod === "bank" && !selectedBank) || (paymentMethod === "upi" && !selectedUpi)) {
       toast.error('Please fill all fields with valid data');
       return;
     }
 
     setLoading(true);
     try {
-      // Get the selected bank account details
-      const bankIndex = parseInt(selectedBank.split('-')[1]);
-      const selectedBankAccount = bankAccounts[bankIndex];
-      
-      console.log('Selected bank account:', selectedBankAccount);
-      console.log('Bank account index:', bankIndex);
-      console.log('Selected bank value:', selectedBank);
-      
+      console.log('Payment method:', paymentMethod);
+
+      const withdrawalData: any = {
+        user_id: user.id,
+        amount_usdt: usdtAmount,
+        amount_inr: inrAmount,
+        usdt_rate: rates?.sell_rate || 102,
+        fund_type: selectedFundType,
+        fund_rate: selectedFundRate?.rate || 0,
+        status: 'ongoing'
+      };
+
+      if (paymentMethod === "bank") {
+        const bankIndex = parseInt(selectedBank.split('-')[1]);
+        const selectedBankAccount = bankAccounts[bankIndex];
+        withdrawalData.bank_account_id = user.id;
+      } else {
+        const upiIndex = parseInt(selectedUpi.split('-')[1]);
+        const selectedUpiAccount = upiAccounts[upiIndex];
+        withdrawalData.upi_account_id = selectedUpiAccount.id;
+      }
+
       const { error } = await supabase
         .from('withdrawals')
-        .insert({
-          user_id: user.id,
-          amount_usdt: usdtAmount,
-          amount_inr: inrAmount,
-          bank_account_id: user.id,
-          usdt_rate: rates?.sell_rate || 102,
-          fund_type: selectedFundType,
-          fund_rate: selectedFundRate?.rate || 0,
-          status: 'ongoing'
-        });
+        .insert(withdrawalData);
 
       console.log('Withdrawal submission result:', { error });
 
@@ -131,6 +169,8 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
       toast.success('Withdrawal request submitted successfully');
       setAmount("");
       setSelectedBank("");
+      setSelectedUpi("");
+      setPaymentMethod("bank");
       onSuccess();
       onClose();
     } catch (error) {
@@ -195,42 +235,105 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bank">Select Bank Account</Label>
-            {loadingBanks ? (
-              <div className="text-sm text-muted-foreground">Loading bank accounts...</div>
-            ) : bankAccounts.length === 0 ? (
-              <div className="space-y-3">
-                <div className="text-sm text-red-500 p-3 bg-red-50 border border-red-200 rounded-md">
-                  No bank accounts found. Please add a bank account first.
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    onClose();
-                    // Navigate to add bank page - you might need to implement this
-                    window.location.href = '/add-bank';
-                  }}
-                  className="w-full"
-                >
-                  Add Bank Account First
-                </Button>
+            <Label>Select Payment Method</Label>
+            <RadioGroup value={paymentMethod} onValueChange={(value: "bank" | "upi") => {
+              setPaymentMethod(value);
+              if (value === "bank") {
+                setSelectedUpi("");
+              } else {
+                setSelectedBank("");
+              }
+            }}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="bank" id="bank" />
+                <Label htmlFor="bank" className="cursor-pointer">Bank Account</Label>
               </div>
-            ) : (
-              <Select value={selectedBank} onValueChange={setSelectedBank}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose bank account" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border shadow-lg z-50">
-                  {bankAccounts.map((bank, index) => (
-                    <SelectItem key={`${bank.user_id}-${index}`} value={`${bank.user_id}-${index}`}>
-                      {bank.bank_name} - {bank.account_number.slice(-4)} ({bank.account_holder_name})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="upi" id="upi" />
+                <Label htmlFor="upi" className="cursor-pointer">UPI</Label>
+              </div>
+            </RadioGroup>
           </div>
+
+          {paymentMethod === "bank" && (
+            <div className="space-y-2">
+              <Label htmlFor="bank">Select Bank Account</Label>
+              {loadingBanks ? (
+                <div className="text-sm text-muted-foreground">Loading bank accounts...</div>
+              ) : bankAccounts.length === 0 ? (
+                <div className="space-y-3">
+                  <div className="text-sm text-red-500 p-3 bg-red-50 border border-red-200 rounded-md">
+                    No bank accounts found. Please add a bank account first.
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      onClose();
+                      // Navigate to add bank page - you might need to implement this
+                      window.location.href = '/add-bank';
+                    }}
+                    className="w-full"
+                  >
+                    Add Bank Account First
+                  </Button>
+                </div>
+              ) : (
+                <Select value={selectedBank} onValueChange={setSelectedBank}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose bank account" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border shadow-lg z-50">
+                    {bankAccounts.map((bank, index) => (
+                      <SelectItem key={`${bank.user_id}-${index}`} value={`${bank.user_id}-${index}`}>
+                        {bank.bank_name} - {bank.account_number.slice(-4)} ({bank.account_holder_name})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
+
+          {paymentMethod === "upi" && (
+            <div className="space-y-2">
+              <Label htmlFor="upi">Select UPI Account</Label>
+              {loadingUpis ? (
+                <div className="text-sm text-muted-foreground">Loading UPI accounts...</div>
+              ) : upiAccounts.length === 0 ? (
+                <div className="space-y-3">
+                  <div className="text-sm text-red-500 p-3 bg-red-50 border border-red-200 rounded-md">
+                    No UPI accounts found. Please add a UPI account first.
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      onClose();
+                      // Navigate to add UPI page - you might need to implement this
+                      window.location.href = '/add-upi';
+                    }}
+                    className="w-full"
+                  >
+                    Add UPI Account First
+                  </Button>
+                </div>
+              ) : (
+                <Select value={selectedUpi} onValueChange={setSelectedUpi}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose UPI account" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border shadow-lg z-50">
+                    {upiAccounts.map((upi, index) => (
+                      <SelectItem key={`${upi.user_id}-${index}`} value={`${upi.user_id}-${index}`}>
+                        {upi.name} - {upi.upi_id}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )}
 
           {usdtAmount > 0 && selectedFundRate && (
             <Card className="p-4 bg-gray-50">
@@ -258,7 +361,12 @@ const WithdrawForm = ({ isOpen, onClose, onSuccess }: WithdrawFormProps) => {
           <Button
             type="submit"
             className="w-full"
-            disabled={loading || !isValidAmount || !selectedBank || bankAccounts.length === 0}
+            disabled={
+              loading ||
+              !isValidAmount ||
+              (paymentMethod === "bank" && (!selectedBank || bankAccounts.length === 0)) ||
+              (paymentMethod === "upi" && (!selectedUpi || upiAccounts.length === 0))
+            }
           >
             {loading ? "Processing..." : "Submit Withdrawal"}
           </Button>

@@ -30,12 +30,12 @@ import TransferPayment from "./pages/TransferPayment";
 import Ranking from "./pages/Ranking";
 import Team from "./pages/Team";
 import LuckyDraw from "./pages/LuckyDraw";
-import SpinWheel from "./pages/SpinWheel";
 import EditProfile from "./pages/EditProfile";
 import BonusChecklist from "./pages/BonusChecklist";
 import Admin from "./pages/Admin";
 import CryptoExchange from "./pages/CryptoExchange";
 import NotFound from "./pages/NotFound";
+import F2fCorporate from "./pages/F2fCorporate";
 import SuspendedUserScreen from "./components/SuspendedUserScreen";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -62,7 +62,6 @@ const AppContent = () => {
             <Route path="/ranking" element={<Ranking />} />
             <Route path="/team" element={<Team />} />
             <Route path="/lucky-draw" element={<LuckyDraw />} />
-            <Route path="/spin-wheel" element={<SpinWheel />} />
             <Route path="/recharge" element={<Recharge />} />
             <Route path="/recharge-guide" element={<RechargeGuide />} />
             <Route path="/earning-guide" element={<EarningGuide />} />
@@ -86,6 +85,7 @@ const AppContent = () => {
             <Route path="/bonus-checklist" element={<BonusChecklist />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/crypto-exchange" element={<CryptoExchange />} />
+            <Route path="/f2f-corporate" element={<F2fCorporate />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, Users, Share2, MessageCircle, Facebook, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,10 +8,29 @@ import BottomNavigation from "@/components/BottomNavigation";
 import CautionBanner from "@/components/CautionBanner";
 import { toast } from "sonner";
 import { useTeamStats } from "@/hooks/useTeamStats";
+import { supabase } from "@/integrations/supabase/client";
 
 const Team = () => {
   const { teamStats, loading } = useTeamStats();
-  const [inviteLink] = useState("https://short-url.org/1cI87");
+  const [members, setMembers] = useState<Array<{ name: string, member_user_id: string | null }>>([]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const { data } = await supabase
+          .from('teams')
+          .select('name, member_user_id')
+          .eq('owner_user_id', (window as any).supabase?.auth?.user?.()?.id || undefined);
+
+        if (data) setMembers(data as any);
+      } catch (e) {
+        console.warn('Failed to fetch team members', e);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+  const [inviteLink] = useState("https://nrxpay.vercel.app/");
   const [copied, setCopied] = useState(false);
   
   const shareMessage = `Join me on NRXPay and exchange usdt at highest rate in whole market! 🚀\n\nSign up using my link: ${inviteLink}`;
@@ -87,13 +106,13 @@ const Team = () => {
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <p className="text-sm">
-                <span className="font-bold text-green-700">3%</span> of invited subline's rebate is yours
+                <span className="font-bold text-green-700">4%</span> of invited subline's rebate is yours
               </p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <p className="text-sm">
-                <span className="font-bold text-green-700">3%</span> of invited subline's withdrawal rebate is yours
+                <span className="font-bold text-green-700">4%</span> of invited subline's withdrawal rebate is yours
               </p>
             </div>
           </div>
@@ -153,6 +172,16 @@ const Team = () => {
               <p className="text-xs text-muted-foreground">Total Earned</p>
             </div>
           </div>
+          {members.length > 0 && (
+            <div className="mt-4">
+              <h4 className="text-sm font-medium mb-2">Team Members</h4>
+              <ul className="list-disc list-inside text-sm text-muted-foreground">
+                {members.map((m, idx) => (
+                  <li key={idx}>{m.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Card>
       </main>
 

@@ -24,8 +24,33 @@ export function DepositForm({ amount, onSuccess, onCancel }: DepositFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
   const [copied, setCopied] = useState(false);
-  
-  const transactionId = "TBbY2a6YoY6c932DrkZMLKRe3iBBg8X7jM";
+  const [usdtAddress, setUsdtAddress] = useState("Loading...");
+
+  useEffect(() => {
+    const fetchUsdtAddress = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("transaction_addresses")
+          .select("address")
+          .eq("crypto_type", "usdt")
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching USDT address:", error);
+          setUsdtAddress("Address not available");
+        } else if (data) {
+          setUsdtAddress(data.address);
+        } else {
+          setUsdtAddress("Address not configured");
+        }
+      } catch (error) {
+        console.error("Error fetching USDT address:", error);
+        setUsdtAddress("Address not available");
+      }
+    };
+
+    fetchUsdtAddress();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,9 +74,9 @@ export function DepositForm({ amount, onSuccess, onCancel }: DepositFormProps) {
   };
 
   const copyTransactionId = () => {
-    navigator.clipboard.writeText(transactionId);
+    navigator.clipboard.writeText(usdtAddress);
     setCopied(true);
-    toast.success("Transaction ID copied to clipboard!");
+    toast.success("USDT Address copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -152,10 +177,10 @@ export function DepositForm({ amount, onSuccess, onCancel }: DepositFormProps) {
               </span>
             </div>
             
-            <h4 className="font-semibold text-lg">Transaction ID</h4>
+            <h4 className="font-semibold text-lg">USDT Address</h4>
             <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300">
               <p className="text-sm font-mono break-all text-center">
-                {transactionId}
+                {usdtAddress}
               </p>
             </div>
 
@@ -163,6 +188,7 @@ export function DepositForm({ amount, onSuccess, onCancel }: DepositFormProps) {
               onClick={copyTransactionId}
               className="w-full flex items-center justify-center space-x-2"
               variant={copied ? "secondary" : "default"}
+              disabled={usdtAddress === "Loading..." || usdtAddress === "Address not configured"}
             >
               {copied ? (
                 <>
@@ -172,7 +198,7 @@ export function DepositForm({ amount, onSuccess, onCancel }: DepositFormProps) {
               ) : (
                 <>
                   <Copy className="h-4 w-4" />
-                  <span>Copy Transaction ID</span>
+                  <span>Copy USDT Address</span>
                 </>
               )}
             </Button>

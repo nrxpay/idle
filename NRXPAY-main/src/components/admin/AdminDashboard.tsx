@@ -19,7 +19,8 @@ import {
   CheckCircle,
   Wallet,
   Sparkles,
-  Coins
+  Coins,
+  UserPlus
 } from "lucide-react";
 import { UserManagement } from "./UserManagement";
 import { TransactionManagement } from "./TransactionManagement";
@@ -34,8 +35,8 @@ import NotificationSender from "./NotificationSender";
 import TaskManagement from "./TaskManagement";
 import { FundRateManagement } from "./FundRateManagement";
 import MinimumWithdrawalManagement from "./MinimumWithdrawalManagement";
-import SpinWheelManagement from "./SpinWheelManagement";
 import CryptoManagement from "./CryptoManagement";
+import TransactionAddressManagement from "./TransactionAddressManagement";
 
 export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("users");
@@ -175,6 +176,10 @@ export function AdminDashboard() {
                 <span className="text-sm font-medium">Task Management</span>
               </Button>
               
+
+              
+              {/* Team Management removed */}
+              
               <Button
                 variant={activeTab === "notifications" ? "secondary" : "ghost"}
                 onClick={() => setActiveTab("notifications")}
@@ -185,21 +190,21 @@ export function AdminDashboard() {
               </Button>
               
               <Button
-                variant={activeTab === "spin-wheel" ? "secondary" : "ghost"}
-                onClick={() => setActiveTab("spin-wheel")}
-                className="w-full justify-start h-12 px-4 hover:bg-gray-50"
-              >
-                <Sparkles className="h-5 w-5 mr-3 text-gray-600" />
-                <span className="text-sm font-medium">Spin Wheel Management</span>
-              </Button>
-              
-              <Button
                 variant={activeTab === "crypto" ? "secondary" : "ghost"}
                 onClick={() => setActiveTab("crypto")}
                 className="w-full justify-start h-12 px-4 hover:bg-gray-50"
               >
                 <Coins className="h-5 w-5 mr-3 text-gray-600" />
                 <span className="text-sm font-medium">Crypto Management</span>
+              </Button>
+
+              <Button
+                variant={activeTab === "transaction-addresses" ? "secondary" : "ghost"}
+                onClick={() => setActiveTab("transaction-addresses")}
+                className="w-full justify-start h-12 px-4 hover:bg-gray-50"
+              >
+                <Wallet className="h-5 w-5 mr-3 text-gray-600" />
+                <span className="text-sm font-medium">Transaction Addresses</span>
               </Button>
             </div>
           </Card>
@@ -254,16 +259,22 @@ export function AdminDashboard() {
             <TaskManagement />
           </TabsContent>
 
+
+
+          {/* TeamManagement removed */}
+
           <TabsContent value="notifications">
             <NotificationSender />
           </TabsContent>
 
-          <TabsContent value="spin-wheel">
-            <SpinWheelManagement />
-          </TabsContent>
+          {/* SpinWheelManagement removed */}
 
           <TabsContent value="crypto">
             <CryptoManagement />
+          </TabsContent>
+
+          <TabsContent value="transaction-addresses">
+            <TransactionAddressManagement />
           </TabsContent>
         </Tabs>
       </div>

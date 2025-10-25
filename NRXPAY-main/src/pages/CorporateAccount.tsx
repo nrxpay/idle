@@ -6,6 +6,7 @@ import { useState } from "react";
 import AvailableFunds from "@/components/AvailableFunds";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserAccounts } from "@/hooks/useUserAccounts";
+import { useUserBalance } from "@/hooks/useUserBalance";
 import UserAccountsList from "@/components/UserAccountsList";
 
 
@@ -13,6 +14,7 @@ const CorporateAccount = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { corporateAccounts, loading } = useUserAccounts(user?.id);
+  const { balance } = useUserBalance();
   const [showAccountsList, setShowAccountsList] = useState(false);
 
   const handleUploadClick = () => {
@@ -225,7 +227,7 @@ const CorporateAccount = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span className="text-green-700 font-medium">No Hidden Fees</span>
+                  <span className="text-green-700 font-medium">F2F Available</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -238,7 +240,7 @@ const CorporateAccount = () => {
           <div className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-xl">
             <p className="text-lg font-bold mb-2">🎯 Limited Time Offer</p>
             <p className="text-sm opacity-90">
-              First 100 corporate accounts get bonus ₹10,000 starting credit!
+              100% safe funds Available. Payout twice a week.
             </p>
           </div>
         </div>

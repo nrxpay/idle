@@ -9,21 +9,22 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserBalance } from "@/hooks/useUserBalance";
 
 const CorporateForm = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { balance } = useUserBalance();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     companyName: "",
     companyType: "",
     registrationNumber: "",
-    gstNumber: "",
     panNumber: "",
-    contactPerson: "",
+    holderName: "",
     contactPhone: "",
     contactEmail: "",
-    address: "",
+    bankName: "",
     aadharPhoto: null as File | null,
     panPhoto: null as File | null,
   });
@@ -55,14 +56,19 @@ const CorporateForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast.error("Please login to submit your corporate account details");
       return;
     }
 
-    if (!formData.companyName || !formData.companyType || !formData.registrationNumber || !formData.panNumber || !formData.contactPerson || !formData.contactPhone || !formData.contactEmail || !formData.address) {
+    if (!formData.companyName || !formData.companyType || !formData.registrationNumber || !formData.panNumber || !formData.holderName || !formData.contactPhone || !formData.contactEmail) {
       toast.error("Please fill all required fields");
+      return;
+    }
+
+    if (balance.usdt_balance < 1500) {
+      toast.error("Minimum 1500 USD recharge required to upload corporate account");
       return;
     }
 
@@ -100,12 +106,10 @@ const CorporateForm = () => {
           company_name: formData.companyName,
           company_type: formData.companyType,
           registration_number: formData.registrationNumber,
-          gst_number: formData.gstNumber,
           pan_number: formData.panNumber,
-          contact_person: formData.contactPerson,
+          contact_person: formData.holderName,
           contact_phone: formData.contactPhone,
           contact_email: formData.contactEmail,
-          address: formData.address,
           documents_uploaded: documentsUploaded,
           status: 'pending'
         });
@@ -157,6 +161,20 @@ const CorporateForm = () => {
             </div>
 
             <div>
+              <Label htmlFor="bankName">Bank Name</Label>
+              <Select value={formData.bankName} onValueChange={(value) => setFormData(prev => ({ ...prev, bankName: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select bank (optional)" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border shadow-lg z-50 max-h-60">
+                  {indianBanks.map((bank) => (
+                    <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <Label htmlFor="companyType">Company Type</Label>
               <Select value={formData.companyType} onValueChange={(value) => setFormData(prev => ({ ...prev, companyType: value }))}>
                 <SelectTrigger>
@@ -184,16 +202,6 @@ const CorporateForm = () => {
             </div>
 
             <div>
-              <Label htmlFor="gstNumber">GST Number (Optional)</Label>
-              <Input
-                id="gstNumber"
-                value={formData.gstNumber}
-                onChange={(e) => setFormData(prev => ({ ...prev, gstNumber: e.target.value }))}
-                placeholder="Enter GST number"
-              />
-            </div>
-
-            <div>
               <Label htmlFor="panNumber">PAN Number</Label>
               <Input
                 id="panNumber"
@@ -205,12 +213,12 @@ const CorporateForm = () => {
             </div>
 
             <div>
-              <Label htmlFor="contactPerson">Contact Person</Label>
+              <Label htmlFor="holderName">Holder Name</Label>
               <Input
-                id="contactPerson"
-                value={formData.contactPerson}
-                onChange={(e) => setFormData(prev => ({ ...prev, contactPerson: e.target.value }))}
-                placeholder="Enter contact person name"
+                id="holderName"
+                value={formData.holderName}
+                onChange={(e) => setFormData(prev => ({ ...prev, holderName: e.target.value }))}
+                placeholder="Enter holder name"
                 required
               />
             </div>
@@ -238,16 +246,7 @@ const CorporateForm = () => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Enter company address"
-                required
-              />
-            </div>
+            
 
             <div>
               <Label>Aadhar Photo</Label>

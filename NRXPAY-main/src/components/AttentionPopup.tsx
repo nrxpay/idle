@@ -27,7 +27,7 @@ const AttentionPopup = ({ isOpen, onClose, usdtRate }: AttentionPopupProps) => {
           <AlertDialogDescription className="text-center space-y-4">
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-base font-bold text-blue-800">
-                1 USDT = {usdtRate} INR
+                Run corporate accounts on NRX PAY  
               </p>
             </div>
             

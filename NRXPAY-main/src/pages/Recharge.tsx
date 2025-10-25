@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { useUSDTRates } from "@/hooks/useUSDTRates";
 import { DepositForm } from "@/components/DepositForm";
 import { DepositHistory } from "@/components/DepositHistory";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Recharge = () => {
   const { rates } = useUSDTRates();
@@ -14,14 +15,15 @@ const Recharge = () => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
+  const [usdtAddress, setUsdtAddress] = useState("Loading...");
 
   const handleProceed = () => {
     if (!selectedAmount) {
       toast.error("Please select an amount");
       return;
     }
-    if (selectedAmount < 50) {
-      toast.error("Minimum amount is $50");
+    if (selectedAmount < 100) {
+      toast.error("Minimum amount is $100");
       return;
     }
     setShowDepositForm(true);
@@ -29,8 +31,8 @@ const Recharge = () => {
 
   const handleCustomAmountSet = () => {
     const amount = parseFloat(customAmount);
-    if (isNaN(amount) || amount < 50) {
-      toast.error("Please enter a valid amount above $50");
+    if (isNaN(amount) || amount < 100) {
+      toast.error("Please enter a valid amount above $100");
       return;
     }
     setSelectedAmount(amount);
@@ -44,7 +46,48 @@ const Recharge = () => {
     toast.success("Deposit request submitted! It will be reviewed by admin.");
   };
 
-  const rechargeAmounts = [50, 100, 200, 500, 1000, 2000];
+  const rechargeAmounts = [100, 250, 500, 1000, 2000, 5000];
+
+  // Read `amount` from query param to preselect an amount (e.g., from Profile shortcut)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const amt = params.get('amount');
+      if (amt) {
+        const num = parseFloat(amt);
+        if (!isNaN(num)) setSelectedAmount(num);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  // Fetch USDT address from database
+  useEffect(() => {
+    const fetchUsdtAddress = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("transaction_addresses")
+          .select("address")
+          .eq("crypto_type", "usdt")
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching USDT address:", error);
+          setUsdtAddress("Address not available");
+        } else if (data) {
+          setUsdtAddress(data.address);
+        } else {
+          setUsdtAddress("Address not configured");
+        }
+      } catch (error) {
+        console.error("Error fetching USDT address:", error);
+        setUsdtAddress("Address not available");
+      }
+    };
+
+    fetchUsdtAddress();
+  }, []);
 
   if (showDepositForm && selectedAmount) {
     return (
@@ -130,7 +173,7 @@ const Recharge = () => {
 
         {/* Custom Amount */}
         <Card className="p-4">
-          <h4 className="font-medium mb-3">Custom Amount (Min: $50)</h4>
+          <h4 className="font-medium mb-3">Custom Amount (Min: $100)</h4>
           <div className="flex gap-2">
             <input
               type="number"
@@ -165,10 +208,11 @@ const Recharge = () => {
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="font-bold text-blue-600">₿</span>
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="font-medium">Pay Using Crypto App</p>
-                  <p className="text-sm text-muted-foreground">USDT Transfer</p>
+                  <p className="text-sm text-muted-foreground">USDT Address: {usdtAddress}</p>
                 </div>
+                {/* Description removed - now in the flex-1 div above */}
               </div>
               <input type="radio" name="payment" defaultChecked />
             </div>

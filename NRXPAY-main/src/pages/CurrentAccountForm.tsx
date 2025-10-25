@@ -9,10 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserBalance } from "@/hooks/useUserBalance";
 
 const CurrentAccountForm = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { balance } = useUserBalance();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     bankName: "",
@@ -50,7 +52,7 @@ const CurrentAccountForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast.error("Please login to submit your account details");
       return;
@@ -58,6 +60,11 @@ const CurrentAccountForm = () => {
 
     if (!formData.bankName || !formData.accountNumber || !formData.holderName || !formData.ifscCode || !formData.mobileNumber) {
       toast.error("Please fill all required fields");
+      return;
+    }
+
+    if (balance.usdt_balance < 500) {
+      toast.error("Minimum 500 USD recharge required to upload current account");
       return;
     }
 

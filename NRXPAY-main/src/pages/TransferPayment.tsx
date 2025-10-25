@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import CautionBanner from "@/components/CautionBanner";
+import { supabase } from "@/integrations/supabase/client";
 
 const TransferPayment = () => {
   const navigate = useNavigate();
@@ -13,13 +14,38 @@ const TransferPayment = () => {
   const [animationClass, setAnimationClass] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes in seconds
-  
-  const walletAddress = "TBbY2a6YoY6c932DrkZMLKRe3iBBg8X7jM";
+  const [usdtAddress, setUsdtAddress] = useState("Loading...");
 
   useEffect(() => {
     setAnimationClass("animate-pulse");
     const timer = setTimeout(() => setAnimationClass(""), 2000);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchUsdtAddress = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("transaction_addresses")
+          .select("address")
+          .eq("crypto_type", "usdt")
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching USDT address:", error);
+          setUsdtAddress("Address not available");
+        } else if (data) {
+          setUsdtAddress(data.address);
+        } else {
+          setUsdtAddress("Address not configured");
+        }
+      } catch (error) {
+        console.error("Error fetching USDT address:", error);
+        setUsdtAddress("Address not available");
+      }
+    };
+
+    fetchUsdtAddress();
   }, []);
 
   useEffect(() => {
@@ -38,9 +64,9 @@ const TransferPayment = () => {
   }, []);
 
   const copyAddress = () => {
-    navigator.clipboard.writeText(walletAddress);
+    navigator.clipboard.writeText(usdtAddress);
     setCopied(true);
-    toast.success("Address copied to clipboard!");
+    toast.success("USDT Address copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -117,7 +143,7 @@ const TransferPayment = () => {
             
             <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300">
               <p className="text-sm font-mono break-all text-center">
-                {walletAddress}
+                {usdtAddress}
               </p>
             </div>
 

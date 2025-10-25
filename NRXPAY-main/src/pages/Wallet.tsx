@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,16 +11,36 @@ import WithdrawForm from "@/components/WithdrawForm";
 import { useUserBalance } from "@/hooks/useUserBalance";
 import { useUSDTRates } from "@/hooks/useUSDTRates";
 import { useUserBankAccounts } from "@/hooks/useUserBankAccounts";
+import AddUpiForm from "@/components/AddUpiForm";
+import UpiAccountsList from "@/components/UpiAccountsList";
+
 const Wallet = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("deposit");
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
-  
+  const [showUpiForm, setShowUpiForm] = useState(false);
+  const [showAllBanks, setShowAllBanks] = useState(false);
+
+  // Open modals based on query params (from profile shortcuts)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('openUpi')) {
+        setShowUpiForm(true);
+      }
+      if (params.get('openWithdraw')) {
+        setShowWithdrawForm(true);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   // Use custom hooks for balance, rates, and bank accounts
   const { balance, loading: balanceLoading } = useUserBalance();
   const { rates, loading: ratesLoading } = useUSDTRates();
   const { bankAccounts, loading: bankLoading } = useUserBankAccounts();
-  
+
   // Calculate USDT balance in INR using sell rate
   const usdtInINR = rates && balance ? balance.usdt_balance * rates.sell_rate : 0;
 
@@ -64,19 +84,29 @@ const Wallet = () => {
         </Card>
 
         {/* Bank Account Details */}
-        <Card className="p-4">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">Bank Account Details</h3>
+        <Card className="p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-muted-foreground">Bank Account Details</h3>
+            {bankAccounts.length > 2 && (
+              <button
+                className="text-xs text-primary underline"
+                onClick={() => setShowAllBanks((s) => !s)}
+              >
+                {showAllBanks ? "Show less" : `Show all (${bankAccounts.length})`}
+              </button>
+            )}
+          </div>
           {bankLoading ? (
             <p className="text-sm text-muted-foreground">Loading bank details...</p>
           ) : bankAccounts.length > 0 ? (
             <div className="space-y-2">
-              {bankAccounts.map((account, index) => (
-                <div key={`${account.user_id}-${index}`} className="bg-muted/50 p-3 rounded-lg">
-                  <p className="font-medium text-foreground">{account.account_holder_name}</p>
-                  <p className="text-sm text-muted-foreground">{account.bank_name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    ****{account.account_number.slice(-4)} • {account.ifsc_code}
-                  </p>
+              {(showAllBanks ? bankAccounts : bankAccounts.slice(0, 2)).map((account, index) => (
+                <div key={`${account.user_id}-${index}`} className="bg-muted/50 p-2 rounded-lg flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-foreground text-sm">{account.account_holder_name}</p>
+                    <p className="text-xs text-muted-foreground">{account.bank_name}</p>
+                    <p className="text-xs text-muted-foreground">****{account.account_number.slice(-4)} • {account.ifsc_code}</p>
+                  </div>
                   <p className="text-xs text-muted-foreground">{account.branch_name}</p>
                 </div>
               ))}
@@ -84,6 +114,10 @@ const Wallet = () => {
           ) : (
             <p className="text-sm text-muted-foreground">No bank account added yet</p>
           )}
+        </Card>
+
+        <Card className="p-4">
+          <UpiAccountsList />
         </Card>
 
         {/* Action Buttons */}
@@ -95,8 +129,8 @@ const Wallet = () => {
           >
             {bankAccounts.length > 0 ? "Change Bank" : "Add Bank"}
           </Button>
-          <Button variant="outline-neon" className="h-12" onClick={() => navigate("/security-pin?target=change-bank")}>
-            Security PIN
+          <Button variant="outline-neon" className="h-12" onClick={() => setShowUpiForm(true)}>
+            Add UPI
           </Button>
         </div>
 
@@ -136,6 +170,16 @@ const Wallet = () => {
           setActiveTab("withdraw");
         }}
       />
+      {showUpiForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <AddUpiForm />
+            <Button variant="ghost" onClick={() => setShowUpiForm(false)} className="mt-4 w-full">
+              Close
+            </Button>
+          </div>
+        </div>
+      )}
     </div>;
 };
 export default Wallet;

@@ -6,6 +6,7 @@ import { useState } from "react";
 import AvailableFunds from "@/components/AvailableFunds";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserAccounts } from "@/hooks/useUserAccounts";
+import { useUserBalance } from "@/hooks/useUserBalance";
 import UserAccountsList from "@/components/UserAccountsList";
 
 
@@ -13,6 +14,7 @@ const CurrentAccount = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { currentAccounts, loading } = useUserAccounts(user?.id);
+  const { balance } = useUserBalance();
   const [showAccountsList, setShowAccountsList] = useState(false);
 
   const handleUploadClick = () => {

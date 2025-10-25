@@ -29,9 +29,11 @@ const CryptoExchangePage = () => {
   const [quantityError, setQuantityError] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [transactionIdCopied, setTransactionIdCopied] = useState(false);
+  const [cryptoAddresses, setCryptoAddresses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchCryptoRates();
+    fetchCryptoAddresses();
   }, []);
 
   const fetchCryptoRates = async () => {
@@ -56,6 +58,26 @@ const CryptoExchangePage = () => {
     } catch (error) {
       console.error("Error fetching rates:", error);
       toast.error("Failed to load crypto rates");
+    }
+  };
+
+  const fetchCryptoAddresses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("transaction_addresses")
+        .select("*");
+
+      if (error) throw error;
+
+      const addressMap: Record<string, string> = {};
+      data?.forEach((addr: any) => {
+        addressMap[addr.crypto_type] = addr.address;
+      });
+
+      setCryptoAddresses(addressMap);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+      toast.error("Failed to load crypto addresses");
     }
   };
 
@@ -155,13 +177,7 @@ const CryptoExchangePage = () => {
   };
 
   const getCryptoAddress = (type: string) => {
-    const addresses: Record<string, string> = {
-      bitcoin: "15EcrkUsLH3UigiZfmFiVnh2NFuwdh5nQX",
-      ethereum: "0x3c0de1582f8870af1b65c41cfdee45a113fb502e",
-      solana: "ABTXB6utC7emXiHBywyoExJ7gmAZSFookG2W72upfSF7",
-      litecoin: "LfSisJS3dt2e88EXbJqqbT3x5jBYBbthb4",
-    };
-    return addresses[type] || "";
+    return cryptoAddresses[type] || "Address not configured";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

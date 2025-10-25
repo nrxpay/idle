@@ -82,7 +82,7 @@ export type Database = {
       }
       corporate_accounts: {
         Row: {
-          address: string
+          address: string | null
           company_name: string
           company_type: string
           contact_email: string
@@ -103,7 +103,7 @@ export type Database = {
           verified_by: string | null
         }
         Insert: {
-          address: string
+          address?: string | null
           company_name: string
           company_type: string
           contact_email: string
@@ -631,6 +631,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_upis: {
+        Row: {
+          id: number
+          user_id: string
+          upi_id: string
+          name: string
+          mobile_number: string
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          upi_id: string
+          name: string
+          mobile_number: string
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          upi_id?: string
+          name?: string
+          mobile_number?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       sensitive_data_audit_log: {
         Row: {
           accessed_at: string
@@ -727,6 +754,33 @@ export type Database = {
           total_earned?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          member_user_id: string | null
+          name: string
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_user_id?: string | null
+          name: string
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_user_id?: string | null
+          name?: string
+          owner_user_id?: string
+          updated_at?: string
         }
         Relationships: []
       }

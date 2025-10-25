@@ -1,4 +1,4 @@
-import { User, RotateCcw, Edit, HelpCircle, Lock, Coins, Gamepad2, Star, Shield, Settings } from "lucide-react";
+import { User, RotateCcw, Edit, HelpCircle, Lock, Coins, Gamepad2, Star, Shield, Settings, Gift } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -13,11 +13,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const Profile = () => {
-  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const { isAdmin } = useAdminAuth();
   const [userNumber, setUserNumber] = useState<string>("000000");
+  const navigate = useNavigate();
+  
+  
   
   useEffect(() => {
     const fetchUserNumber = async () => {
@@ -73,7 +75,6 @@ const Profile = () => {
     { icon: Lock, label: "Security PIN", action: () => navigate("/set-pin") },
     { icon: Coins, label: "Coin Flip", action: () => navigate("/coin-flip") },
     { icon: Star, label: "Lucky Draw", action: () => navigate("/lucky-draw") },
-    { icon: Shield, label: "Spin Wheel", action: () => navigate("/spin-wheel") },
     { icon: Settings, label: "Account Settings", action: () => navigate("/edit-profile") },
     { icon: HelpCircle, label: "Customer Support", action: () => navigate("/support-guide") },
   ];
@@ -111,6 +112,8 @@ const Profile = () => {
                 <span className="text-sm font-medium">{option.label}</span>
               </Button>
             ))}
+
+
             
             {isAdmin && (
               <Button
@@ -132,6 +135,8 @@ const Profile = () => {
             </Button>
           </div>
         </Card>
+
+
       </main>
 
       <BottomNavigation />

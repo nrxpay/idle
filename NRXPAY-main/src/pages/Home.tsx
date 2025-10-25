@@ -7,21 +7,20 @@ import Header from "@/components/Header";
 import BottomNavigation from "@/components/BottomNavigation";
 import CautionBanner from "@/components/CautionBanner";
 import AttentionPopup from "@/components/AttentionPopup";
-import RechargeSpinWheel from "@/components/RechargeSpinWheel";
 import { useUSDTRates } from "@/hooks/useUSDTRates";
 import { useSpinWheelConfig } from "@/hooks/useSpinWheelConfig";
 
 const Home = () => {
   const { rates } = useUSDTRates();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { config: spinConfig } = useSpinWheelConfig();
+  // spin wheel removed
   const navigate = useNavigate();
   const [showAttentionPopup, setShowAttentionPopup] = useState(false);
-  const [showSpinWheel, setShowSpinWheel] = useState(false);
+  // spin wheel removed
   const [isDraggingWheel, setIsDraggingWheel] = useState(false);
   const [wheelPos, setWheelPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [wheelImgError, setWheelImgError] = useState(false);
-  const spinIconSrc = (spinConfig as any)?.icon_url || "/lovable-uploads/spin-wheel.png";
+  // spin wheel removed
 
   useEffect(() => {
     // Show popup only once per user session
@@ -102,47 +101,7 @@ const Home = () => {
           />
         </div>
 
-        {/* Floating Spin Wheel CTA */}
-        <div
-          className="fixed z-50"
-          style={{ left: `${wheelPos.x}px`, top: `${wheelPos.y}px` }}
-        >
-          <button
-            aria-label="Open recharge spin wheel"
-            onClick={() => setShowSpinWheel(true)}
-            onMouseDown={startDrag}
-            onMouseUp={endDrag}
-            onMouseLeave={endDrag}
-            onMouseMove={(e) => isDraggingWheel && onDragMove(e.clientX, e.clientY)}
-            onTouchStart={startDrag}
-            onTouchEnd={endDrag}
-            onTouchCancel={endDrag}
-            onTouchMove={(e) => {
-              const t = e.touches[0];
-              if (t) onDragMove(t.clientX, t.clientY);
-            }}
-            className="h-16 w-16 rounded-full bg-transparent text-black shadow-none ring-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-          >
-            {wheelImgError ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                <circle cx="12" cy="12" r="2" fill="currentColor" />
-                <path d="M12 2 L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <path d="M22 12 L18 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <path d="M12 22 L12 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <path d="M2 12 L6 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            ) : (
-              <img
-                src={spinIconSrc}
-                alt="Spin wheel"
-                className="h-16 w-16 object-contain pointer-events-none drop-shadow-lg"
-                onError={() => setWheelImgError(true)}
-                draggable={false}
-              />
-            )}
-          </button>
-        </div>
+        {/* RechargeSpinWheel removed */}
 
         {/* Tutorial Section */}
         <Card 
@@ -218,6 +177,26 @@ const Home = () => {
           </div>
         </Card>
 
+        {/* F2F Corporate Account Section */}
+        <div className="text-sm text-muted-foreground font-medium mb-2">
+          f2f corporate ( less % safe work )
+        </div>
+        <Card
+          className="p-4 bg-gray-50 cursor-pointer hover:scale-105 transition-transform"
+          onClick={() => navigate("/f2f-corporate")}
+        >
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <span className="text-orange-600 text-sm">🤝</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-foreground">
+                Earn <span className="text-xl text-green-600 font-extrabold">100K</span> every day!
+              </h3>
+            </div>
+          </div>
+        </Card>
+
         {/* Recharge Button */}
         <Button
           onClick={() => navigate("/recharge")}
@@ -283,10 +262,7 @@ const Home = () => {
         usdtRate={rates?.buy_rate || 99}
       />
 
-      <RechargeSpinWheel 
-        isOpen={showSpinWheel}
-        onClose={() => setShowSpinWheel(false)}
-      />
+      {/* RechargeSpinWheel removed */}
 
       <BottomNavigation />
     </div>

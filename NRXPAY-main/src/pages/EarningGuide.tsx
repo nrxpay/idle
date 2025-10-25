@@ -49,9 +49,44 @@ const EarningGuide = () => {
             </div>
           </div>
 
-          {/* Method 2: Referral System */}
+          {/* Method 2: Upload Bank Accounts */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-blue-600">2. Earn through Referrals</h3>
+            <h3 className="text-lg font-semibold text-purple-600">2. Earn by Uploading Bank Accounts</h3>
+            <div className="bg-purple-50 p-4 rounded-lg space-y-3">
+              <p className="text-sm">
+                <span className="font-bold">High Daily Earnings:</span> Upload your bank accounts and earn up to ₹30k+ daily through current accounts and ₹1 lakh+ through corporate accounts.
+              </p>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">How to Start:</p>
+                <ul className="text-sm text-gray-600 space-y-1 ml-4">
+                  <li>• Go to Homepage → Current Account or Corporate Account</li>
+                  <li>• Click "Upload Current/Corporate Account Now"</li>
+                  <li>• Fill account details (Bank name, Account number, IFSC, etc.)</li>
+                  <li>• Upload required documents (Aadhar, PAN photos)</li>
+                  <li>• Submit application for review</li>
+                  <li>• Once approved, start run and earn daily comission!</li>
+                </ul>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Minimum Requirements:</p>
+                <ul className="text-sm text-gray-600 space-y-1 ml-4">
+                  <li>• Current Account: Minimum 500 USD recharge required</li>
+                  <li>• Corporate Account: Minimum 1500 USD recharge required</li>
+                  <li>• Valid bank account with required documents</li>
+                  <li>• Active mobile number linked to account</li>
+                </ul>
+              </div>
+              <div className="bg-white p-3 rounded border-l-4 border-purple-500">
+                <p className="text-sm font-semibold text-purple-700">
+                  💎 Current Account: ₹30k+ daily | Corporate Account: ₹1 lakh+ daily earnings potential!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Method 3: Referral System */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-blue-600">3. Earn through Referrals</h3>
             <div className="bg-blue-50 p-4 rounded-lg space-y-3">
               <p className="text-sm">
                 <span className="font-bold">3% Rebate System:</span> Invite friends and earn 3% rebate when they recharge.
