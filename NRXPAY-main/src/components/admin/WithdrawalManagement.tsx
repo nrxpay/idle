@@ -242,7 +242,7 @@ export function WithdrawalManagement() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => updateWithdrawalStatus(withdrawal.id, 'suspended', 'Suspended pending review')}
+                              onClick={() => updateWithdrawalStatus(withdrawal.id, 'Timed out', 'Order timed out (insufficient amount)')}
                             >
                               <Pause className="h-4 w-4 mr-1" />
                               Suspend
