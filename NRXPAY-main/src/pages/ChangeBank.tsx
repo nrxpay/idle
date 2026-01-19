@@ -20,21 +20,7 @@ const ChangeBank = () => {
   });
 
   const indianBanks = [
-    "State Bank of India (SBI)",
-    "HDFC Bank",
-    "ICICI Bank",
-    "Axis Bank",
-    "Kotak Mahindra Bank",
-    "Punjab National Bank (PNB)",
-    "Bank of Baroda",
-    "Canara Bank",
-    "Union Bank of India",
-    "Indian Bank",
-    "Central Bank of India",
-    "IDBI Bank",
-    "UCO Bank",
-    "Bank of Maharashtra",
-    "Indian Overseas Bank",
+    "System under mantainance",
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
